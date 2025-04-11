@@ -8,3 +8,4 @@ accelerate
 peft
 optimum
 faiss-cpu
+fuzzywuzzy

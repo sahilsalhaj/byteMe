@@ -1,0 +1,222 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Find My Fund 🔍</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .result {
+      margin-top: 30px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Find My Fund</h1>
+  <input type="text" id="queryInput" placeholder="Type something like 'icici infra'..." />
+  <br>
+  <button onclick="submitQuery()">Search</button>
+
+  <div class="result" id="resultBox"></div>
+
+  <script>
+    async function submitQuery() {
+      const query = document.getElementById("queryInput").value;
+      const response = await fetch("/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+      const data = await response.json();
+      const resultBox = document.getElementById("resultBox");
+
+      resultBox.innerHTML = "";
+      if (data.results && data.results.length > 0) {
+        data.results.forEach((item, i) => {
+          const div = document.createElement("div");
+          div.innerHTML = `<strong>${i + 1}. ${item.name || item.shortName || "No name"}</strong><br>
+                           Industry: ${item.industry || "N/A"}<br>
+                           Ticker: ${item.ticker || "N/A"}<br><hr>`;
+          resultBox.appendChild(div);
+        });
+      } else {
+        resultBox.innerHTML = "<em>No results found.</em>";
+      }
+    }
+  </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Find My Fund 🔍</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #00e5ff;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      max-width: 500px;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      background-color: #1f1f1f;
+      color: #fff;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      background: linear-gradient(135deg, #00e5ff, #00bcd4);
+      color: #000;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #00bcd4, #00e5ff);
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    .result {
+      margin-top: 30px;
+      width: 90%;
+      max-width: 600px;
+      text-align: left;
+      animation: fadeIn 0.6s ease-in;
+    }
+
+    .result-box {
+      background-color: #1f1f1f;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateY(10px);
+      animation: slideUp 0.3s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    em {
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Find My Fund</h1>
+  <input type="text" id="queryInput" placeholder="Type something like 'icici infra'..." />
+  <br>
+  <button onclick="submitQuery(event)">Search</button>
+
+  <div class="result" id="resultBox"></div>
+
+  <script>
+    async function submitQuery(e) {
+      const query = document.getElementById("queryInput").value;
+      const resultBox = document.getElementById("resultBox");
+
+      // Clear previous results
+      resultBox.innerHTML = "";
+
+      // Ripple effect
+      const button = e.target;
+      const circle = document.createElement("span");
+      circle.classList.add("ripple");
+      const rect = button.getBoundingClientRect();
+      circle.style.left = `${e.clientX - rect.left}px`;
+      circle.style.top = `${e.clientY - rect.top}px`;
+      button.appendChild(circle);
+      setTimeout(() => circle.remove(), 600);
+
+      // Fetch results
+      const response = await fetch("/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+
+      const data = await response.json();
+
+      if (data.results && data.results.length > 0) {
+        data.results.forEach((item, i) => {
+          const div = document.createElement("div");
+          div.classList.add("result-box");
+          div.style.animationDelay = `${i * 100}ms`;
+          div.innerHTML = `<strong>${i + 1}. ${item.name || item.shortName || "No name"}</strong><br>
+                           Industry: ${item.industry || "N/A"}<br>
+                           Ticker: ${item.ticker || "N/A"}`;
+          resultBox.appendChild(div);
+        });
+      } else {
+        resultBox.innerHTML = "<em>No results found.</em>";
+      }
+    }
+  </script>
+</body>
+</html>
